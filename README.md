@@ -1,1 +1,1 @@
-# jelena
+# Some University Python projects
