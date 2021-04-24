@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #define MAX_SIZE 1000
-
+int id = 0;
 void input_values(int n, int *p) {
     printf("Unesite %d vrednosti:", n * n);
     for (int i = 0; i < n * n; i++) {
@@ -218,6 +218,7 @@ typedef struct TREE_NODE {
     struct TREE_NODE **sons; // pokazivac na listu pokazivaca, svaki pokazivac iz liste pokjazuje na novog sina
     struct coordinates *zeros; //pozicije nula
     int num_of_zeros;
+    int id;
     int *values;
 }
         TREE_NODE;
@@ -247,6 +248,7 @@ struct TREE_NODE *tree(int **value, int m, int n, int *valuestoput) { // m je br
         }
     }
     temp->num_of_zeros = k;
+    temp->id = id;
     return temp;
 }
 
@@ -293,6 +295,7 @@ struct TREE_NODE *createNode(int **value, int n, struct coordinates *zero_positi
     for(int i = 0; i<newNode->num_of_zeros; i++){
         newNode->zeros[i] = temp[i];
     }
+    newNode->id = id;
     return newNode;
 }
 
@@ -413,13 +416,31 @@ int *remove_from_arr(int *arr, int n, int value) {
     return arr;
 }
 
+void find_node(struct queue *Qtemp, struct TREE_NODE *root, int n, int find){
+    add(Qtemp, root);
+    int flag = 1;
+    while(flag && !isempty(Qtemp)){
+        while( Qtemp->front->info->id != find){
+            for(int i = 0 ; i < Qtemp->front->info->num_of_zeros; i++){
+                if(Qtemp->front->info->sons != NULL) {
+                    add(Qtemp, Qtemp->front->info->sons[i]);
+                }
+            }
+            delete(Qtemp);
+        }
+        arr_print2(Qtemp->front->info->info, n);
+        flag = 0;
+    }
+}
+
+
 int main() {
     int *magic_square_values, p[MAX_SIZE], temp = 0; //temp br unetih elemenata u kvadrat na pocetku,  p niz tih brojev
     int size_of_magic_square, flag, loop;
     int **init_state;
     struct TREE_NODE *root;
     struct queue *Q = createQueue();
-
+    
     printf("Unesite velicinu magicnog kvadrata n");
     scanf("%d", &size_of_magic_square);
 
@@ -480,7 +501,7 @@ int main() {
                 for (int i = 0; i < loop; i++) {
                     for (int j = 0; j < numofzeros; j++) {
                         square[zerocoordinates[j].x][zerocoordinates[j].y] = values_to_put[i]; //ubacivanje vrednosti u matricu na odredjenu poziciju
-
+                        id++;
                         Q->front->info->sons[sonposition] = createNode(square, size_of_magic_square, zerohelp, numofzeros,
                                                            remove_from_arr(notinmatrix, numofzeros,
                                                                            values_to_put[i])); //kreiranje novog sina
@@ -503,11 +524,28 @@ int main() {
                 delete(Q);
             }
         }
-        /*for(int i = 0; i < pow(root->num_of_zeros, 2); i++){
-            arr_print2(root->sons[i]->info, size_of_magic_square);
+        printf("IZGLED STABLA");
+        putchar('\n');
+        add(Q, root);
+        while(!isempty(Q)){
+            if(Q->front->info->sons == NULL){
+                printf("%d\n", Q->front->info->id);
+                printf("/");
+                putchar('\n');
+                delete(Q);
+                continue;
+            }
+            for(int i = 0 ; i < Q->front->info->num_of_zeros; i++){
+                add(Q, Q->front->info->sons[i]);
+            }
+            printf("%d\n", Q->front->info->id);
+            for(int i = 0; i < Q->front->info->num_of_zeros; i++){
+                printf("%d ", Q->front->info->sons[i]->id);
+            }
             putchar('\n');
-        }*/
-        //print_queue(Q, size_of_magic_square);
+            delete(Q);
+        }
+        find_node(Q, root, size_of_magic_square, 0);
 
         deallocate(init_state, size_of_magic_square);
     }
