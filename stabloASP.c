@@ -171,6 +171,9 @@ int set_flag(int **matrix, int n, int numberofzeros){
         if(sub_diagonal == 0 && main_diagonal != 0){
             if( main_diagonal == row_check)return 0;
         }
+        if(sub_diagonal != 0 && main_diagonal != 0){
+            if(sub_diagonal == row_check && main_diagonal == row_check)return 0;
+        }
         if(main_diagonal == 0 && sub_diagonal == 0) return 0;
 
     }else if(row_check == 0 && column_check != 0){
@@ -185,6 +188,9 @@ int set_flag(int **matrix, int n, int numberofzeros){
         if(sub_diagonal == 0 && main_diagonal != 0){
             if( main_diagonal == column_check)return 0;
         }
+        if(sub_diagonal != 0 && main_diagonal != 0){
+            if(sub_diagonal == column_check && main_diagonal == column_check)return 0;
+        }
         if(main_diagonal == 0 && sub_diagonal == 0) return 0;
 
     } else{
@@ -195,8 +201,12 @@ int set_flag(int **matrix, int n, int numberofzeros){
             return 0;
         }
         if(main_diagonal == 0 && sub_diagonal == 0) return 0;
+        if(main_diagonal != 0 && sub_diagonal != 0){
+            if(main_diagonal == sub_diagonal)return 0;
+            else return -1;
+        }
     }
-
+    return -1;
 }
 
 typedef struct coordinates {
@@ -434,6 +444,43 @@ void find_node(struct queue *Qtemp, struct TREE_NODE *root, int n, int find){
     }
 }
 
+int perfect_square(int **matrix, int n){
+    int **temp = malloc(n*sizeof(int*));
+    safe_allocate2(temp);
+    for(int i = 0; i < 2*n; i++){
+        temp[i] = malloc(2*n*sizeof(int ));
+    }
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < n; j++){
+            temp[i][j] = matrix[i][j];
+            temp[i][n+j] = matrix[i][j];
+        }
+    }
+    /*for(int i = 0; i< n;i++){
+        for(int j = 0; j< 2*n;j++){
+            printf("%d ", temp[i][j]);
+        }
+        putchar('\n');
+    }*/
+    //main
+    int s = main_diagonal_sum(matrix, n);
+    int diag = 0;
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < n; j++){
+            diag += temp[j+1][j+1+i];
+        }
+        if(diag != s)return 0;
+        diag = 0;
+    }
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < n; j++){
+            diag += temp[j+1][(n+i)-j];
+        }
+        if(diag != s)return 0;
+        diag = 0;
+    }
+    return 1;
+}
 
 int main() {
     int *magic_square_values, p[MAX_SIZE], temp = 0; //temp br unetih elemenata u kvadrat na pocetku,  p niz tih brojev
@@ -523,6 +570,13 @@ int main() {
                 if(been)printf("\nPostorder ispis resenja magicnog kvadrata\n"), been = 0;
                 arr_print2(Q->front->info->info, size_of_magic_square);
                 putchar('\n');
+                /*if(perfect_square(Q->front->info->info, size_of_magic_square)){
+                    printf("Savrsen magicni kvadrat\n");
+                }
+                else{
+                    printf("Nije savrsen");
+                }
+                putchar('\n');*/
                 delete(Q);
             }
         }
