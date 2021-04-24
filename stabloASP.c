@@ -1,3 +1,6 @@
+//savrsen?
+//dealokacija
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -76,8 +79,6 @@ initialize_magic_square(int **matrix, int *p, int *temp) { // fali provera da li
     }
     return matrix;
 }
-//ispis stabla
-//prolazak kroz stablo ispis resenja, provera da l su savrsena
 
 //FUNKCIJE ZA RACUNANJE ZBIRA PO KOLONAMA, REDOVIMA, DIJAGONALAMA
 int row_sum(int *p, int n) {
@@ -440,7 +441,7 @@ int main() {
     int **init_state;
     struct TREE_NODE *root;
     struct queue *Q = createQueue();
-    
+
     printf("Unesite velicinu magicnog kvadrata n");
     scanf("%d", &size_of_magic_square);
 
@@ -465,7 +466,7 @@ int main() {
 
         int **square = malloc(size_of_magic_square*sizeof(int*));
         //loop = pow(size_of_magic_square, 2) - temp; //broj neubacenih vrednosti na pocetku
-
+        int been = 1;
         while(!isempty(Q)) {
             if(Q->front->info->leaf_flag == -1){
                 delete(Q);
@@ -519,35 +520,53 @@ int main() {
 
                 continue;
             }else if(Q->front->info->leaf_flag == 1){
+                if(been)printf("\nPostorder ispis resenja magicnog kvadrata\n"), been = 0;
                 arr_print2(Q->front->info->info, size_of_magic_square);
                 putchar('\n');
                 delete(Q);
             }
         }
-        printf("IZGLED STABLA");
-        putchar('\n');
-        add(Q, root);
-        while(!isempty(Q)){
-            if(Q->front->info->sons == NULL){
-                printf("%d\n", Q->front->info->id);
-                printf("/");
-                putchar('\n');
-                delete(Q);
-                continue;
-            }
-            for(int i = 0 ; i < Q->front->info->num_of_zeros; i++){
-                add(Q, Q->front->info->sons[i]);
-            }
-            printf("%d\n", Q->front->info->id);
-            for(int i = 0; i < Q->front->info->num_of_zeros; i++){
-                printf("%d ", Q->front->info->sons[i]->id);
-            }
-            putchar('\n');
-            delete(Q);
-        }
-        find_node(Q, root, size_of_magic_square, 0);
+        while(1) {
+            printf("Unesite neku od opcija:\n");
+            printf("1. Ispis stabla\n");
+            printf("2. Ispisi odredjeni cvor\n");
+            printf("3. Kraj programa\n");
 
-        deallocate(init_state, size_of_magic_square);
+            int choice;
+            scanf("%d", &choice);
+            if (choice == 1) {
+                printf("IZGLED STABLA");
+                putchar('\n');
+                add(Q, root);
+                while (!isempty(Q)) {
+                    if (Q->front->info->sons == NULL) {
+                        printf("%d\n", Q->front->info->id);
+                        printf("/");
+                        putchar('\n');
+                        delete(Q);
+                        continue;
+                    }
+                    for (int i = 0; i < Q->front->info->num_of_zeros; i++) {
+                        add(Q, Q->front->info->sons[i]);
+                    }
+                    printf("%d\n", Q->front->info->id);
+                    for (int i = 0; i < Q->front->info->num_of_zeros; i++) {
+                        printf("%d ", Q->front->info->sons[i]->id);
+                    }
+                    putchar('\n');
+                    delete(Q);
+                }
+            }
+            if (choice == 2) {
+                printf("Unesite indeks cvora koji zelite da ispisete:");
+                int inp;
+                scanf("%d", &inp);
+                find_node(Q, root, size_of_magic_square, inp);
+            }
+            if (choice == 3) {
+                exit(0);
+            }
+        }
     }
     return 0;
 }
