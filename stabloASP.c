@@ -1,6 +1,3 @@
-//savrsen?
-//dealokacija
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -116,7 +113,7 @@ int sub_diagonal_sum(int **matrix, int n) {
     }
     return subdiagonal;
 }
-//VIDI DA LI OVO MOZE BRZE PREKO ONOG ZBIRA;
+
 int set_flag(int **matrix, int n, int numberofzeros){
     int *arrrow , *arrcol, row, col;
     arrrow = calloc(n, sizeof(int));
@@ -242,7 +239,6 @@ struct TREE_NODE *tree(int **value, int m, int n, int *valuestoput) { // m je br
     temp->sons = malloc(m * sizeof(struct TREE_NODE *));
     temp->zeros = malloc(sqrt(m) * sizeof(struct coordinates));
     temp->values = malloc(sqrt(m) * sizeof(int));
-    //memcpy(temp->values, valuestoput, m*sizeof(int));
 
     safe_allocate1(temp->values);
     for (int i = 0; i < sqrt(m); i++) {
@@ -284,24 +280,13 @@ struct TREE_NODE *createNode(int **value, int n, struct coordinates *zero_positi
     newNode->leaf_flag = 0;
     newNode->sons = NULL;
 
-    //safe al
-    /*for (int i = 0; i < numofzeros; i++) {
-        newNode->zeros[i] = zero_positions[i];
-    }*/
     newNode->zeros = (struct coordinates *) malloc(newNode->num_of_zeros * sizeof(struct coordinates));
-    //struct coordinates *temp = (struct coordinates* ) malloc(numofzeros * sizeof(struct coordinates));
     if(newNode->num_of_zeros > 0){
         for (int k = 0; k < numofzeros; k++) {
             if (value[a][b] != 0 && zero_positions[k].x == a && zero_positions[k].y == b) {
                 newNode->zeros = Clearedcoord(zero_positions, numofzeros, k);
-                //(newNode->num_of_zeros)--;
             }
         }
-
-        //newNode->zeros = temp;
-        //for(int i = 0; i < newNode->num_of_zeros; i++)newNode->zeros[i] = temp[i];
-        printf("JEJ");
-        printf("%d %d\n", newNode->zeros[0].x, newNode->zeros[0].y);
 
         newNode->values = malloc(newNode->num_of_zeros * sizeof(int));
         safe_allocate1(newNode->values);
@@ -313,7 +298,6 @@ struct TREE_NODE *createNode(int **value, int n, struct coordinates *zero_positi
         newNode->num_of_zeros = 0;
         newNode->zeros = NULL;
         newNode->values = NULL;
-        printf("NULAAAAAAAAAAA\n");
     }
     newNode->id = id;
     return newNode;
@@ -361,7 +345,6 @@ void add(struct queue *q, struct TREE_NODE *treen) {
 }
 
 void delete (struct queue *q) {
-    //struct queueNode *temp = q->front;
     if (q->front == NULL){
         return ;
     }
@@ -504,29 +487,13 @@ int main() {
         root->leaf_flag = set_flag(root->info, size_of_magic_square, root->num_of_zeros);
         add(Q, root);
 
-
-        // TODO remove
-        printf("O00000000000000000000000\n");
-        fflush(stdout);
-        setbuf(stdout, NULL);
-
-        // TODO remove
-        int count = 0;
-
         int **square = malloc(size_of_magic_square*sizeof(int*));
-        //loop = pow(size_of_magic_square, 2) - temp; //broj neubacenih vrednosti na pocetku
         int been = 1;
         while(!isempty(Q)) {
-            // TODO remove
-            count++;
-            printf("%d\n", count);
-            fflush(stdout);
 
             if(Q->front->info->leaf_flag == -1){
                 delete(Q);
 
-                // TODO remove
-                printf("delete(Q)\n");
             } else if(Q->front->info->leaf_flag == 0){
 
                 for(int i = 0; i < size_of_magic_square; i++){
@@ -535,38 +502,27 @@ int main() {
                         square[i][j] = Q->front->info->info[i][j];
                     }
                 }
-
-                // TODO remove
-                printf("new(Q)\n");
                 int numofzeros = Q->front->info->num_of_zeros; //broj koordinata nula
                 Q->front->info->sons = malloc( numofzeros*numofzeros * sizeof(struct TREE_NODE *));
                 int sonposition = 0;
                 struct coordinates *zerocoordinates = (struct coordinates *) malloc(numofzeros * sizeof(struct coordinates));
-                //struct coordinates *zerohelp = (struct coordinates *) malloc(numofzeros * sizeof(struct coordinates));
-                //safe al
-                //struct TREE_NODE **rootsons = malloc(pow(numofzeros, 2)*sizeof(struct TREE_NODE*));
                 int *notinmatrix = malloc(numofzeros * sizeof(int));
                 safe_allocate1(notinmatrix);
                 for (int i = 0; i < numofzeros; i++) {
                     notinmatrix[i] = Q->front->info->values[i];
                 }
-                //safe al
+
                 int *values_to_put = malloc(numofzeros * sizeof(int));
                 safe_allocate1(values_to_put);
                 for (int i = 0; i < numofzeros; i++) {
                     zerocoordinates[i] = Q->front->info->zeros[i];
-                    //zerohelp[i] = Q->front->info->zeros[i];
                     values_to_put[i] = Q->front->info->values[i];
                 }
 
-                // TODO remove
-                printf("new1(Q)\n");
-                printf("%d %d\n", zerocoordinates[0].x, zerocoordinates[0].y);
                 for (int i = 0; i < numofzeros; i++) {
                     for (int j = 0; j < numofzeros; j++) {
                         square[zerocoordinates[j].x][zerocoordinates[j].y] = values_to_put[i]; //ubacivanje vrednosti u matricu na odredjenu poziciju
                         id++;
-                        printf("EVO\n");
                         Q->front->info->sons[sonposition] = createNode(square, size_of_magic_square, zerocoordinates, numofzeros,
                                                            remove_from_arr(notinmatrix, numofzeros,
                                                                            values_to_put[i]), zerocoordinates[j].x, zerocoordinates[j].y); //kreiranje novog sina
@@ -575,7 +531,6 @@ int main() {
                         square[zerocoordinates[j].x][zerocoordinates[j].y] = 0;
                         sonposition++;
                         for(int i = 0; i < numofzeros; i++){
-                            //zerohelp[i] = zerocoordinates[i];
                             notinmatrix[i] = values_to_put[i];
                         }
                     }
@@ -583,19 +538,10 @@ int main() {
                 free(notinmatrix);
                 free(zerocoordinates);
                 free(values_to_put);
-                // TODO remove
-                printf("sons(Q)\n");
 
                 delete(Q);
-
-                // TODO remove
-                printf("NewDelete(Q)\n");
-
                 continue;
             }else if(Q->front->info->leaf_flag == 1){
-
-                // TODO remove
-                printf("perfectStart(Q)\n");
 
                 if(been)printf("\nPostorder ispis resenja magicnog kvadrata\n"), been = 0;
                 arr_print2(Q->front->info->info, size_of_magic_square);
@@ -608,9 +554,6 @@ int main() {
                 }
                 putchar('\n');
                 delete(Q);
-
-                // TODO remove
-                printf("perfectEnd(Q)\n");
             }
         }
 
